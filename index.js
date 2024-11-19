@@ -9,7 +9,7 @@ const httpStatusText = require("./utils/httpStatusText");
 
 const app = express() ;
 
-const port  = process.env.PORT ;
+const port  = process.env.PORT || 3000;
 
 const url = process.env.MONGO_URL ;
 
@@ -27,6 +27,9 @@ app.use(express.json());
 app.use('/api/auth', auth);
 app.use('/api/users', userRoute);
 
+app.get('/', (req, res) => {
+    res.send('Hello, Vercel!');
+  });
 
 app.all('*', (req, res, next) => {
     return res.status(404).json({ status: httpStatusText.ERROR, message: 'this resource is not available' })
