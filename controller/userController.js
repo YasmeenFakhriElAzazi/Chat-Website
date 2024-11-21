@@ -2,11 +2,24 @@ const User = require('../models/userModel') ;
 const {validationResult} = require('express-validator')
 const httpStatusText = require("../utils/httpStatusText")
 
-exports.getAllUsers = async(req, res)=>{
+
+exports.getUsersForSidebar = async (req, res) => {
+	try {
+		const loggedInUserId = req.user._id;
+
+		const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } } ,{"__v" : false , "password": false , "token" : false});
+
+		res.status(200).json(filteredUsers);
+	} catch (error) {
+        return res.status(500).json({status : httpStatusText.ERROR , data : null , message :error.message , code : 500 })
+	}
+};
+
+// exports.getAllUsers = async(req, res)=>{
    
-    const users = await User.find({} ,{"__v" : false , "password ": false}) ; 
-    res.json({status : httpStatusText.SUCCESS , data : {users} })
-} ;
+//     const users = await User.find({} ,{"__v" : false , "password ": false}) ; 
+//     res.json({status : httpStatusText.SUCCESS , data : {users} })
+// } ;
 
 exports.getUser = async (req,res)=>{
 

@@ -1,11 +1,13 @@
 const express = require('express') ;
 const userController = require('../controller/userController');
 const verifyToken = require('../middlware/verifyToken')
+const authenticateUser = require('../middlware/authenticateUser');
+
 const router  = express.Router() ;
 
 
 router.route('/')
-    .get(userController.getAllUsers)
+    .get(authenticateUser , userController.getUsersForSidebar)
     
 
 router.route('/:id')
