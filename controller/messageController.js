@@ -1,6 +1,7 @@
 const Conversation = require('../models/conversationModel.js')
 const Message = require('../models/messageModel.js') 
 const httpStatusText = require("../utils/httpStatusText")
+const { getReceiverSocketId, io }  = require("../socket/socket.js") 
 
 //import { getReceiverSocketId, io } from "../socket/socket.js";
 
@@ -35,6 +36,12 @@ exports.sendMessage = async (req, res) => {
 		// await newMessage.save();
 
         await Promise.all([conversation.save(), newMessage.save()]);
+
+		const receiverSocketId = getReceiverSocketId(receiverId);
+		if (receiverSocketId) {
+			// io.to(<socket_id>).emit() used to send events to specific client
+			io.to(receiverSocketId).emit("newMessage", newMessage);
+		}
 
         res.status(201).json(newMessage);
 

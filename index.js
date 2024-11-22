@@ -7,8 +7,7 @@ const auth  = require('./routes/auth')
 const userRoute = require('./routes/userRouter');
 const messageRoute = require('./routes/messageRouter');
 const httpStatusText = require("./utils/httpStatusText");
-
-const app = express() ;
+const {app , server }  = require('./socket/socket')
 
 const port  = process.env.PORT || 3000;
 
@@ -18,11 +17,11 @@ mongoose.connect(url).then(() => {
     console.log('mongodb server started');
 
 })
-app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    credentials: true
-}))
+// app.use(cors({
+//     origin: '*',
+//     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+//     credentials: true
+// }))
 app.use(express.json());
 
 app.use('/api/auth', auth);
@@ -37,7 +36,7 @@ app.all('*', (req, res, next) => {
     return res.status(404).json({ status: httpStatusText.ERROR, message: 'this resource is not available' })
 }) 
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`listening on http://localhost:${port}`);
 
 })
