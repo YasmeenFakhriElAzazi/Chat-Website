@@ -105,7 +105,7 @@ const verifyUser = async (req, res) => {
         await UserVerification.deleteOne({ email: userVerification.email }); // Delete using email
 
 
-        res.status(200).json({ status: httpStatusText.SUCCESS, message: 'User verified', token });
+        res.status(200).json({ status: httpStatusText.SUCCESS, message: 'User verified',  newUser});
     } catch (error) {
         res.status(400).json({ status: httpStatusText.ERROR, message: error.message });
     }
@@ -134,7 +134,7 @@ const login = async (req, res) => {
             const token = await generateToken({ email: user.email, id: user._id  });
             console.log(user.role );
             
-            return res.status(200).json({ status: httpStatusText.SUCCESS, data : {token} });
+            return res.status(200).json({ status: httpStatusText.SUCCESS, data : {user} });
         } else {
             return res.status(400).json({ status: httpStatusText.FAIL, message: 'Invalid credentials' });
         }
