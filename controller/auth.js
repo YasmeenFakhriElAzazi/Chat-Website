@@ -133,7 +133,8 @@ const login = async (req, res) => {
         if (user && matchedPassword) {
             const token = await generateToken({ email: user.email, id: user._id  });
             console.log(user.role );
-            
+            user.token = token;
+
             return res.status(200).json({ status: httpStatusText.SUCCESS, data : {user} });
         } else {
             return res.status(400).json({ status: httpStatusText.FAIL, message: 'Invalid credentials' });

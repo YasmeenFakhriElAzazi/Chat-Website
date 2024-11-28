@@ -30,7 +30,7 @@ const authenticateUser = async (req, res, next) => {
 
         next();
     } catch (error) {
-        return res.status(400).json({ status: 'error', message: error.message });
+        return res.status(402).json({ status: 'error', message: error.message });
     }
 };
 

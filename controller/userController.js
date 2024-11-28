@@ -1,4 +1,5 @@
 const User = require('../models/userModel') ;
+const Contact = require('../models/contactListModel') ;
 const {validationResult} = require('express-validator')
 const httpStatusText = require("../utils/httpStatusText")
 
@@ -15,11 +16,7 @@ exports.getUsersForSidebar = async (req, res) => {
 	}
 };
 
-// exports.getAllUsers = async(req, res)=>{
-   
-//     const users = await User.find({} ,{"__v" : false , "password ": false}) ; 
-//     res.json({status : httpStatusText.SUCCESS , data : {users} })
-// } ;
+
 
 exports.getUser = async (req,res)=>{
 
@@ -35,7 +32,21 @@ exports.getUser = async (req,res)=>{
     }
 }
 
+exports.addUserToAcoount = async(req, res)=>{
+    const loggedInUserId = req.user._id ;
+    const contactId = req.params.id ;
 
+    const contactList  = await Contact.findOne({loggedInUserId}) ;
+    if(!contactList){
+        await Contact.create({loggedInUserId , contacts : [contactId]})
+    }else {
+        if (!contactList.contacts.includes(contactId)){
+            contactList.contacts.push(contactId) ;
+            await contactList.save()
+        }
+    }
+
+}
 exports.updateUser = async (req, res)=>{
     const id  = req.params.id
     try {
