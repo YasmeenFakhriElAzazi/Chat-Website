@@ -7,14 +7,18 @@ const router  = express.Router() ;
 
 
 router.route('/')
-    .get(authenticateUser , userController.getUsersForSidebar)
-    
+        .get(authenticateUser , userController.getUsersForSidebar)
+router.route('/search')
+        .get(authenticateUser , userController.searchUsersByName)
 
 router.route('/:id')
-    .get( verifyToken  , userController.getUser)
-    .patch(verifyToken  ,userController.updateUser )
-    .delete( verifyToken  , userController.deleteUser)
+        .get( verifyToken  , userController.getUser)
+        .patch(verifyToken  ,userController.updateUser )
+        .delete( verifyToken  , userController.deleteUser)
 
+router.route('/contacts/:id')
+        .post(authenticateUser, userController.addUserToAccount) // Add user to contact list
+        .delete(authenticateUser, userController.removeUserFromContactList); // Remove user from contact list
 
 
 module.exports = router ;
