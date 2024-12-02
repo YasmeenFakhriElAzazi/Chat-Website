@@ -26,7 +26,10 @@ io.on('connection' , (socket)=>{
     const userId  = socket.handshake.query.userId ;
 
     if(userId != "undefined") userSocketMap[userId] = socket.id ;
+
     io.emit("getOnlineUsers" , Object.keys(userSocketMap))
+   
+    //Handle disconnect 
     socket.on('disconnect' ,()=>{
         console.log('user disconnected ' , socket.id);
         delete userSocketMap[userId]
@@ -34,6 +37,25 @@ io.on('connection' , (socket)=>{
 
         
     })
+  
+    //Typing status events 
+    socket.on('typing' ,()=>{
+        socket.broadcast.emit('show_typing_status') ;
 
-})
+    })
+    socket.on('stop_typing' ,()=>{
+        socket.broadcast.emit('clear_typing_status') ;
+
+    })
+
+     // Handle message event
+     socket.on('message', (messageData) => {
+        console.log('Message received:', messageData);
+        
+        socket.broadcast.emit('new_message', messageData);
+
+       
+    });
+
+}) ;
 module.exports = {app , io  , server  , getReceiverSocketId} ;
