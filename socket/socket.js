@@ -1,6 +1,9 @@
 const {Server}  = require('socket.io') ;
 const http = require('http') ;
 const express = require('express') ;
+const mongoose = require('mongoose');
+const Message = require('../models/messageModel');  
+const Conversation = require('../models/conversationModel');  
 
 const app = express() ;
 
@@ -13,13 +16,13 @@ const io  = new Server(server ,{
     }
 })
 
+const userSocketMap = {}
 
 const getReceiverSocketId = (receiverId) => {
     return userSocketMap[receiverId] ;
 }
 
 
-const userSocketMap = {}
 io.on('connection' , (socket)=>{
     console.log('a user connected ' , socket.id);
 
@@ -47,12 +50,42 @@ io.on('connection' , (socket)=>{
         socket.broadcast.emit('clear_typing_status') ;
 
     })
-
+    
      // Handle message event
-     socket.on('message', (messageData) => {
-        console.log('Message received:', messageData);
+     socket.on('message', async (messageData) => {
+        const {message , senderId , receiverId} = messageData ;
+        try {
+            if (!message || !senderId || !receiverId) {
+                throw new Error('Message, senderId, or receiverId is missing');
+            }
+            const newMessage = new Message({
+                senderId,
+                receiverId,
+                message
+              });
+            await newMessage.save();
+            let conversation = await Conversation.findOne({
+                participants: { $all: [senderId, receiverId] }
+            });
+            if (!conversation) {
+                conversation = new Conversation({
+                  participants: [senderId, receiverId]
+                });
+                await conversation.save();
+            }
+            conversation.messages.push(newMessage._id);
+            await conversation.save();
+            const receiverSocketId = getReceiverSocketId(receiverId);
+            if (receiverSocketId) {
+                io.to(receiverSocketId).emit('new_message', messageData);
+            }
+            socket.broadcast.emit('new_message', messageData);
+
+
+        } catch (error) {
+            console.error("Error processing message:", error);
+        }
         
-        socket.broadcast.emit('new_message', messageData);
 
        
     });

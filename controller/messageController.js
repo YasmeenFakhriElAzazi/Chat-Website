@@ -51,6 +51,7 @@ exports.sendMessage = async (req, res) => {
 
 };
 
+
 exports.getMessages = async (req, res) => {
 	try {
 		const { id: userToChatId } = req.params;
