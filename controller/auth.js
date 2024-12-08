@@ -132,7 +132,6 @@ const login = async (req, res) => {
         const matchedPassword = await bcrypt.compare(password, user.password);
         if (user && matchedPassword) {
             const token = await generateToken({ email: user.email, id: user._id  });
-            console.log(user.role );
             user.token = token;
 
             return res.status(200).json({ status: httpStatusText.SUCCESS, data : {user} });
