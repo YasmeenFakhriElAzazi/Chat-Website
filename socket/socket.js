@@ -85,6 +85,7 @@ io.on('connection' , (socket)=>{
         } catch (error) {
             console.error("Error processing message:", error);
         }
+        console.log('Message received:', messageData);
         
 
        

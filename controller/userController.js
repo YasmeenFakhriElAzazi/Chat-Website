@@ -1,8 +1,9 @@
+const path  = require('path') ;
+const {validationResult} = require('express-validator')
 const User = require('../models/userModel') ;
 const Contact = require('../models/contactListModel') ;
-const {validationResult} = require('express-validator')
 const httpStatusText = require("../utils/httpStatusText")
-
+const fs  = require('fs') ;
 
 exports.getUsersForSidebar = async (req, res) => {
 	try {
@@ -140,6 +141,44 @@ exports.removeUserFromContactList = async (req, res) => {
     }
 };
 
+exports.uploadPhoto = async (req, res) => {
+    try {
+        // Get the logged-in user's ID from the token
+        const userId = req.user._id;
+
+        // Check if a file is uploaded
+        if (!req.file) {
+            return res.status(400).json({
+                message: "No file uploaded. Please upload an image.",
+            });
+        }
+
+        // File path of the uploaded image
+        const photoPath = path.join("uploads", req.file.filename);
+
+        // Update the user's photo in the database
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { profilePhoto: photoPath },
+            { new: true } // Return the updated user document
+        );
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({
+            message: "Profile photo updated successfully",
+            profilePhoto: photoPath,
+        });
+    } catch (error) {
+        console.error("Error uploading photo:", error);
+        res.status(500).json({
+            message: "An error occurred while uploading the photo",
+            error: error.message,
+        });
+    }
+};
 exports.updateUser = async (req, res)=>{
     const id  = req.params.id
     try {
