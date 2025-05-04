@@ -5,10 +5,11 @@ const mongoose = require('mongoose');
 const Message = require('../models/messageModel');  
 const Conversation = require('../models/conversationModel');  
 
-const app = express() ;
+// create server and socket 
+const app = express() ;  // create express server 
 
-const server  = http.createServer(app);
-const io  = new Server(server ,{
+const server  = http.createServer(app); 
+const io  = new Server(server ,{     // add socket to this server 
     cors : {
         origin: '*',
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
@@ -16,6 +17,7 @@ const io  = new Server(server ,{
     }
 })
 
+// track connected users 
 const userSocketMap = {}
 
 const getReceiverSocketId = (receiverId) => {
@@ -37,8 +39,6 @@ io.on('connection' , (socket)=>{
         console.log('user disconnected ' , socket.id);
         delete userSocketMap[userId]
         io.emit("getOnlineUsers" , Object.keys(userSocketMap))
-
-        
     })
   
     //Typing status events 
